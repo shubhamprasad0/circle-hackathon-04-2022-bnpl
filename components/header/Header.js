@@ -10,12 +10,15 @@ const navBarItems = [
   { id: 7, text: "Profile" },
 ];
 
-const Header = () => {
+const Header = (props) => {
   return (
-    <header className="flex justify-between align-between mt-2 mx-4 pb-2 border-b-2">
-      <div className="text-4xl font-bold text-blue-500">Creators Hub</div>
-      <NavBar items={navBarItems} />
-    </header>
+    <>
+      <header className="flex justify-between align-between mt-2 mx-4 pb-2 border-b-2">
+        <div className="text-4xl font-bold text-blue-500">Creators Hub</div>
+        <NavBar items={navBarItems} />
+      </header>
+      {props.children}
+    </>
   );
 };
 
