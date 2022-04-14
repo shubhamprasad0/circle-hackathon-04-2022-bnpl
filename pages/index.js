@@ -1,8 +1,15 @@
 import Head from 'next/head'
-import Image from 'next/image'
+import Router, { useRouter } from 'next/router'
+import { useEffect } from 'react';
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/product/tv");
+  }, [router]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -10,7 +17,6 @@ export default function Home() {
         <meta name="description" content="Created by Creators Hub" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className='text-6xl font-bold underline'>Hello world!</h1>
     </div>
   )
 }
