@@ -1,8 +1,9 @@
 /**
  * Encrypt card data function
  */
+
 export async function encryptCard(
-    dataToEncrypt: CardDetails): Promise<EncryptedValue> {
+    dataToEncrypt) {
     const decodedPublicKey = await readKey({
         armoredKey: Buffer.from(publicKey, 'base64').toString(),
     });
