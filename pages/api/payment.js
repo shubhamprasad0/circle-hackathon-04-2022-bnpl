@@ -1,8 +1,10 @@
 import { NodeNextRequest } from 'next/dist/server/base-http/node';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const sdk = require('api')('@circle-api/v1#9kvo29l1wa6b24');
 
- async function encryptDetails(){
+ async function encryptDetails(publicKey,dataToEncrypt){
        const decodedPublicKey = await readKey({
         armoredKey: Buffer.from(publicKey, 'base64').toString(),
     });
@@ -26,28 +28,29 @@ const sdk = require('api')('@circle-api/v1#9kvo29l1wa6b24');
 export default async function handler(req, res) {
 
     // Get PCI Public Key 
+    const idempotencKey = uuidv4();
     await sdk.auth(process.env.apikey);
     const publickey = await sdk.getPublicKey(); 
 
 
-    // Encrypt Details 
-       const decodedPublicKey = await readKey({
-        armoredKey: Buffer.from(publicKey, 'base64').toString(),
-    });
+    // // Encrypt Details 
+    //    const decodedPublicKey = await readKey({
+    //     armoredKey: Buffer.from(publicKey, 'base64').toString(),
+    // });
 
-    const message = await createMessage({
-        text: JSON.stringify(dataToEncrypt),
-    });
+    // const message = await createMessage({
+    //     text: JSON.stringify(dataToEncrypt),
+    // });
 
     //const encryptedDatas = await encrypt({message,encryptKeys: decodedPublicKey})
 
-    const encryptCard = await encryptDetails();
+    const encryptCard = await encryptDetails(publickey);
 
     const {billingDetails,metadata,encryptedData,expMonth,expYear,keyId} = req.body;
     const cardDetails =  await sdk.createCard({
         billingDetails: billingDetails,
         metadata: metadata,
-        idempotencyKey: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7',
+        idempotencyKey: idempotencKey,
         keyId: keyId,
         encryptedData: encryptedData, 
         expMonth: expMonth,
@@ -72,17 +75,27 @@ export default async function handler(req, res) {
   
    // const {metadata,encryptedData,amount,source,idempotencyKey,keyId} = req.body;
 
+   const source = {
+        id: cardDetails['data']['id'],
+        type: 'card'
+   }
     const paymentResponse = await sdk.creatPayment({
         metadata: metadata,
         amount: amount,
         autoCapture : true,
-        idempotencKey : '', // Todo: UUID v4 generator
+        idempotencKey : idempotencKey, // Todo: UUID v4 generator
         keyId: keyId,
         verification : 'none',
-        encryptedData: encryptedData // CVV and Card Number Encrypter
+        encryptedData: encryptCard,
+        source: source
     })
 
-    return paymentResponse; // Example response payment in example-payloads
+    try {
+        res.status(200).json({ paymentResponse });
+    } catch (error) {
+        
+    }
+  // Example response payment in example-payloads
 // sdk.createPayment({
 //   metadata: {
 //     email: 'satoshi@circle.com',
@@ -101,4 +114,5 @@ export default async function handler(req, res) {
 //   .then(res => console.log(res))
 //   .catch(err => console.error(err));
 // }
+
 }
