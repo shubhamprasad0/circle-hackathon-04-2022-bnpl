@@ -1,10 +1,13 @@
 import { NodeNextRequest } from 'next/dist/server/base-http/node';
 import { v4 as uuidv4 } from 'uuid';
+import { createMessage, encrypt, readKey } from 'openpgp';
 
 
-const sdk = require('api')('@circle-api/v1#9kvo29l1wa6b24');
 
- async function encryptDetails(publicKey,dataToEncrypt){
+const sdk = require('api')('@circle-api/v1#3j78yrx1rl0tlc3mx');
+
+
+ async function encryptDetails(keyId,publicKey,dataToEncrypt){
        const decodedPublicKey = await readKey({
         armoredKey: Buffer.from(publicKey, 'base64').toString(),
     });
@@ -15,7 +18,7 @@ const sdk = require('api')('@circle-api/v1#9kvo29l1wa6b24');
 
     return encrypt({
         message,
-        encryptionKeys: decodedPublicKey,
+        encryptionKeys: decodedPublicKey
     }).then((ciphertext) => {
         return {
             encryptedData: Buffer.from(ciphertext.toString()).toString('base64'),
@@ -25,39 +28,49 @@ const sdk = require('api')('@circle-api/v1#9kvo29l1wa6b24');
 
 } 
 
+
 export default async function handler(req, res) {
 
     // Get PCI Public Key 
     const idempotencKey = uuidv4();
-    await sdk.auth(process.env.apikey);
-    const publickey = await sdk.getPublicKey(); 
+    sdk.auth(process.env.apikey);
+//    const publickey = await sdk.getPublicKey();
 
+    // Get PCI Data
+  //  const {cardNumber,CVV} = req.body;
 
-    // // Encrypt Details 
-    //    const decodedPublicKey = await readKey({
-    //     armoredKey: Buffer.from(publicKey, 'base64').toString(),
-    // });
+    //const encryptCard = await encryptDetails(publickey['data']['keyId'],publickey['data']['publicKey'],{cardNumber,CVV});
 
-    // const message = await createMessage({
-    //     text: JSON.stringify(dataToEncrypt),
-    // });
-
-    //const encryptedDatas = await encrypt({message,encryptKeys: decodedPublicKey})
-
-    const encryptCard = await encryptDetails(publickey);
-
-    const {billingDetails,metadata,encryptedData,expMonth,expYear,keyId} = req.body;
-    const cardDetails =  await sdk.createCard({
-        billingDetails: billingDetails,
-        metadata: metadata,
-        idempotencyKey: idempotencKey,
-        keyId: keyId,
-        encryptedData: encryptedData, 
-        expMonth: expMonth,
-        expYear: expYear
-    })
-
-
+    // const {billingDetails,metadata,encryptedData,expMonth,expYear,keyId} = req.body;
+    // const cardDetails =  await sdk.createCard({
+    //     billingDetails: billingDetails,
+    //     metadata: metadata,
+    //     idempotencyKey: idempotencKey,
+    //     keyId: keyId,
+    //     encryptedData: encryptedData, 
+    //     expMonth: expMonth,
+    //     expYear: expYear
+    // })
+const card = await sdk.createCard({
+  billingDetails: {
+    name: 'Satoshi Nakamoto',
+    city: 'Boston',
+    country: 'US',
+    line1: '100 Money Street',
+    postalCode: '01234',
+    district: 'MA'
+  },
+  metadata: {
+    email: 'satoshi@circle.com',
+    sessionId: 'DE6FA86F60BB47B379307F851E238617',
+    ipAddress: '244.28.239.130'
+  },
+  idempotencyKey: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7',
+  keyId: 'key1',
+  encryptedData: 'LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgp3Y0JNQTBYV1NGbEZScFZoQVFmL2J2bVVkNG5LZ3dkbExKVTlEdEFEK0p5c0VOTUxuOUlRUWVGWnZJUWEKMGgzQklpRFNRU0RMZmI0NEs2SXZMeTZRbm54bmFLcWx0MjNUSmtPd2hGWFIrdnNSMU5IbnVHN0lUNWJECmZzeVdleXlNK1JLNUVHV0thZ3NmQ2tWamh2NGloY29xUnlTTGtJbWVmRzVaR0tMRkJTTTBsTFNPWFRURQpiMy91eU1zMVJNb3ZiclNvbXkxa3BybzUveWxabWVtV2ZsU1pWQlhNcTc1dGc1YjVSRVIraXM5ckc0cS8KMXl0M0FOYXA3UDhKekFhZVlyTnVNZGhGZFhvK0NFMC9CQnN3L0NIZXdhTDk4SmRVUEV0NjA5WFRHTG9kCjZtamY0YUtMQ01xd0RFMkNVb3dPdE8vMzVIMitnVDZKS3FoMmtjQUQyaXFlb3luNWcralRHaFNyd3NKWgpIdEphQWVZZXpGQUVOaFo3Q01IOGNsdnhZVWNORnJuNXlMRXVGTkwwZkczZy95S3loclhxQ0o3UFo5b3UKMFVxQjkzQURKWDlJZjRBeVQ2bU9MZm9wUytpT2lLall4bG1NLzhlVWc3OGp1OVJ5T1BXelhyTzdLWTNHClFSWm8KPXc1dEYKLS0tLS1FTkQgUEdQIE1FU1NBR0UtLS0tLQo',
+  expMonth: 1,
+  expYear: 2020})
+    
 
     // return encrypt({
     //     message,
@@ -79,7 +92,7 @@ export default async function handler(req, res) {
         id: cardDetails['data']['id'],
         type: 'card'
    }
-    const paymentResponse = await sdk.creatPayment({
+    const paymentResponse = await sdk.createPayment({
         metadata: metadata,
         amount: amount,
         autoCapture : true,
