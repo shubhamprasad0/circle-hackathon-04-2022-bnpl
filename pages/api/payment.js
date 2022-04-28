@@ -5,6 +5,9 @@ import { createMessage, encrypt, readKey } from 'openpgp';
 
 
 const sdk = require('api')('@circle-api/v1#3j78yrx1rl0tlc3mx');
+const sdk2 = require('api')('@circle-api/v1#1w4m41l6sl26apylb');
+//const sdk = require('api')('@circle-api/v1#1w4m41l6sl26apylb');
+
 
 
  async function encryptDetails(keyId,publicKey,dataToEncrypt){
@@ -34,6 +37,7 @@ export default async function handler(req, res) {
     // Get PCI Public Key 
     const idempotencKey = uuidv4();
     sdk.auth(process.env.apikey);
+    const x = process.env.apikey
 //    const publickey = await sdk.getPublicKey();
 
     // Get PCI Data
@@ -51,7 +55,8 @@ export default async function handler(req, res) {
     //     expMonth: expMonth,
     //     expYear: expYear
     // })
-const card = await sdk.createCard({
+        sdk2.auth(process.env.apikey);
+const card = await sdk2.createCard({
   billingDetails: {
     name: 'Satoshi Nakamoto',
     city: 'Boston',
@@ -89,25 +94,35 @@ const card = await sdk.createCard({
    // const {metadata,encryptedData,amount,source,idempotencyKey,keyId} = req.body;
 
    const source = {
-        id: cardDetails['data']['id'],
+        id: card['data']['id'],
         type: 'card'
    }
-    const paymentResponse = await sdk.createPayment({
-        metadata: metadata,
-        amount: amount,
-        autoCapture : true,
-        idempotencKey : idempotencKey, // Todo: UUID v4 generator
-        keyId: keyId,
-        verification : 'none',
-        encryptedData: encryptCard,
-        source: source
-    })
-
-    try {
-        res.status(200).json({ paymentResponse });
-    } catch (error) {
+   try{
+    const paymentResponse = await sdk2.createPayment({
+  metadata: {
+    email: 'satoshi@circle.com',
+    sessionId: 'DE6FA86F60BB47B379307F851E238617',
+    ipAddress: '244.28.239.130'
+  },
+  amount: {amount: '3.14', currency: 'USD'},
+  autoCapture: true,
+  source: {id: 'b8627ae8-732b-4d25-b947-1df8f4007a29', type: 'card'},
+  idempotencyKey: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+  keyId: 'key1',
+  verification: 'none',
+  description: 'Payment',
+  encryptedData: 'UHVibGljS2V5QmFzZTY0RW5jb2RlZA==',
+  channel: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7'
+})
+      res.status(200).json({ paymentResponse });
+  } catch(error){
+    res.status(500).json({ error });
+  }
+   
+   //     res.status(200).json({ paymentResponse });
+   // } catch (error) {
         
-    }
+    //}
   // Example response payment in example-payloads
 // sdk.createPayment({
 //   metadata: {
