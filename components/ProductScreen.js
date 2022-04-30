@@ -2,11 +2,14 @@ import Image from "next/image";
 import { Button } from "reactstrap";
 import MarkdownIt from "markdown-it";
 import markdownItAttrs from "markdown-it-attrs";
+import { useRouter } from "next/router";
 
 const ProductScreen = ({ image, title, description, price }) => {
   const descriptionHtml = MarkdownIt({ html: true })
     .use(markdownItAttrs, { allowedAttributes: ["class"] })
     .render(description);
+
+  const router = useRouter();
 
   return (
     <div className="flex items-center">
@@ -22,7 +25,11 @@ const ProductScreen = ({ image, title, description, price }) => {
             className="my-2 w-1/3 h-12"
             color="primary"
             onClick={() => {
-              console.log("Paying with Credit Card");
+              const currCartValue = +localStorage.getItem("bnpl-cart-value") || 0;
+              const priceNum = +price.replace("$", "").replace(",", "");
+              console.log(priceNum);
+              localStorage.setItem("bnpl-cart-value", currCartValue + priceNum);
+              router.push("/payment/card");
             }}
           >
             Pay with Credit Card
