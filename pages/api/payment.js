@@ -43,22 +43,44 @@ export default async function handler(req, res) {
 
 
     // Get Encryption Details
+    //const encryptCard ;
+    try{
     const encryptCard = await encryptDetails(publickey['data']['keyId'],publickey['data']['publicKey'],{cardNumber,CVV});
-
-
-    // Create Card Payment 
-
     sdk2.auth(process.env.apikey);
-    const {billingDetails,metadata,expMonth,expYear,keyId,amount} = req.body;
+    const {billingDetails,metadata,expMonth,expYear,amount} = req.body;
     const cardDetails =  await sdk2.createCard({
         billingDetails: billingDetails,
         metadata: metadata,
         idempotencyKey: idempotencKey,
-        keyId: keyId,
+        keyId: publickey['data']['keyId'],
         encryptedData: encryptCard,
         expMonth: expMonth,
         expYear: expYear
     })
+
+   const source = {
+        id: cardDetails['data']['id'],
+        type: 'card'
+   }
+     const paymentResponse = await sdk2.createPayment({
+      metadata: metadata,
+  amount: amount,
+  autoCapture: true,
+  source: source,
+  idempotencyKey: idempotencKey,
+  keyId: publickey['data']['keyId'],
+  verification: 'none',
+  description: 'Payment',
+  encryptedData: encryptCard
+  //channel: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7'
+})
+      res.status(200).json({ paymentResponse });
+  }catch(e){
+  res.status(500).json({ e });    }
+
+    // Create Card Payment 
+
+
        
 
     
@@ -99,10 +121,10 @@ export default async function handler(req, res) {
   
    // const {metadata,encryptedData,amount,source,idempotencyKey,keyId} = req.body;
 
-   const source = {
-        id: cardDetails['data']['id'],
-        type: 'card'
-   }
+  //  const source = {
+  //       id: cardDetails['data']['id'],
+  //       type: 'card'
+  //  }
 //    try{
 //     const paymentResponse = await sdk2.createPayment({
 //       metadata: {
@@ -125,23 +147,23 @@ export default async function handler(req, res) {
 //     res.status(500).json({ error });
 //   }
    
-   try{
-    const paymentResponse = await sdk2.createPayment({
-      metadata: metadata,
-  amount: amount,
-  autoCapture: true,
-  source: source,
-  idempotencyKey: idempotencKey,
-  keyId: 'key1',
-  verification: 'none',
-  description: 'Payment',
-  encryptedData: encryptCard
-  //channel: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7'
-})
-      res.status(200).json({ paymentResponse });
-  } catch(error){
-    res.status(500).json({ error });
-  }
+//    try{
+//     const paymentResponse = await sdk2.createPayment({
+//       metadata: metadata,
+//   amount: amount,
+//   autoCapture: true,
+//   source: source,
+//   idempotencyKey: idempotencKey,
+//   keyId: publickey['data']['keyId'],
+//   verification: 'none',
+//   description: 'Payment',
+//   encryptedData: encryptCard
+//   //channel: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7'
+// })
+//       res.status(200).json({ paymentResponse });
+//   } catch(error){
+//     res.status(500).json({ error });
+//   }
    
 
 
