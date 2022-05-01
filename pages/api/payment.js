@@ -7,6 +7,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 
 
 export default async function handler(req, res) {
+
   
 const url =
   "mongodb+srv://shivam:shivam@cluster0.auqwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -32,6 +33,7 @@ try {
     const paymentResponse = await sdk2.createPayment({
       metadata: user.metadata,
       amount: user.amount,
+
       autoCapture: true,
       source: user.source,
       idempotencyKey: uuidv4(),

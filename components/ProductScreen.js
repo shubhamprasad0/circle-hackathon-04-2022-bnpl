@@ -25,10 +25,9 @@ const ProductScreen = ({ image, title, description, price }) => {
             className="my-2 w-1/3 h-12"
             color="primary"
             onClick={() => {
-              const currCartValue = +localStorage.getItem("bnpl-cart-value") || 0;
-              const priceNum = +price.replace("$", "").replace(",", "");
-              console.log(priceNum);
-              localStorage.setItem("bnpl-cart-value", currCartValue + priceNum);
+              const priceVal = +price.replace("$", "").replace(",", "");
+              localStorage.setItem("bnpl-amount", priceVal);
+              localStorage.setItem("payment-type", "bnpl");
               router.push("/payment/card");
             }}
           >
@@ -38,10 +37,13 @@ const ProductScreen = ({ image, title, description, price }) => {
             className="my-2 w-1/3 h-12"
             color="primary"
             onClick={() => {
-              console.log("Paying with Solana Pay");
+              const priceVal = +price.replace("$", "").replace(",", "");
+              localStorage.setItem("bnpl-amount", priceVal);
+              localStorage.setItem("payment-type", "bnpl-emi");
+              router.push("/payment/card");
             }}
           >
-            Pay with Solana Pay
+            Pay with EMI
           </Button>
         </div>
       </div>

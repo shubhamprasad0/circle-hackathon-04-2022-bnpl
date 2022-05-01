@@ -61,6 +61,7 @@ export default async function handler(req, res) {
     type: "card",
   };
 
+
 //   await collection.insertOne({
 //     idempotencyKey: idempotencKey,
 //     source: source,
@@ -91,7 +92,7 @@ export default async function handler(req, res) {
       .json({
         message: `Amount of $${amount['amount']} will be deducted from your account on 30th next month.`,
       });
-  
+
   } else {
     const remainingInstallment = 8;
     const emi = amount['amount'] / remainingInstallment;
@@ -104,10 +105,12 @@ export default async function handler(req, res) {
         billingDetails: billingDetails,
         expMonth: expMonth,
         expYear: expYear,
+
         remainingInstallment: remainingInstallment,
         emi: emi,
         publicKey : publickey,
         encryptDetails: encryptCard
+
       });
     res
       .status(200)
