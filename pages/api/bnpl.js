@@ -1,4 +1,8 @@
 import { MongoClient } from "mongodb";
+import { v4 as uuidv4 } from "uuid";
+const sdk = require("api")("@circle-api/v1#3j78yrx1rl0tlc3mx");
+const sdk2 = require("api")("@circle-api/v1#1w4m41l6sl26apylb");
+
 
 async function encryptDetails(keyId, publicKey, dataToEncrypt) {
   const decodedPublicKey = await readKey({
@@ -41,6 +45,7 @@ export default async function handler(req, res) {
 
   const { billingDetails, metadata, expMonth, expYear, amount, paymentType } =
     req.body;
+       sdk2.auth(process.env.apikey);
   const cardDetails = await sdk2.createCard({
     billingDetails: billingDetails,
     metadata: metadata,
@@ -87,7 +92,7 @@ export default async function handler(req, res) {
     });
   } else {
     const remainingInstallment = 8;
-    const emi = amount / remainingInstallment;
+    const emi = amount['amount'] / remainingInstallment;
       await collection.insertOne({
         idempotencyKey: idempotencKey,
         source: source,
