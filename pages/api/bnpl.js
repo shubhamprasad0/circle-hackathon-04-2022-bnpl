@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     res
       .status(200)
       .json({
-        message: "Amount will be deducted from your account on 30th next month",
+        message: `Amount of $${amount['amount']} will be deducted from your account on 30th next month.`,
       });
     await collection.insertOne({
       idempotencyKey: idempotencKey,
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
       .status(200)
       .json({
         message:
-          "Amount will be deducted from your account every week on Sunday for next 8 weeks",
+           `An amount of $${emi} will be deducted from your account every week on Sunday for next 8 weeks.`
       });
   }
 }
