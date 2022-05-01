@@ -61,35 +61,37 @@ export default async function handler(req, res) {
     type: "card",
   };
 
-  await collection.insertOne({
-    idempotencyKey: idempotencKey,
-    source: source,
-    paymentType: paymentType,
-    amount: amount,
-    metadata: metadata,
-    billingDetails: billingDetails,
-    expMonth: expMonth,
-    expYear: expYear,
-  });
+//   await collection.insertOne({
+//     idempotencyKey: idempotencKey,
+//     source: source,
+//     paymentType: paymentType,
+//     amount: amount,
+//     metadata: metadata,
+//     billingDetails: billingDetails,
+//     expMonth: expMonth,
+//     expYear: expYear,
+//     encryptedData : encryptCard
+//   });
 
   if (paymentType === "bnpl") {
+        await collection.insertOne({
+          idempotencyKey: idempotencKey,
+          source: source,
+          paymentType: paymentType,
+          amount: amount,
+          metadata: metadata,
+          billingDetails: billingDetails,
+          expMonth: expMonth,
+          expYear: expYear,
+          publicKey: publickey,
+          encryptDetails: encryptCard
+        });
     res
       .status(200)
       .json({
         message: `Amount of $${amount['amount']} will be deducted from your account on 30th next month.`,
       });
-    await collection.insertOne({
-      idempotencyKey: idempotencKey,
-      source: source,
-      paymentType: paymentType,
-      amount: amount,
-      metadata: metadata,
-      billingDetails: billingDetails,
-      expMonth: expMonth,
-      expYear: expYear,
-      paymentType: paymentType,
-      publicKey : publickey
-    });
+  
   } else {
     const remainingInstallment = 8;
     const emi = amount['amount'] / remainingInstallment;
@@ -102,10 +104,10 @@ export default async function handler(req, res) {
         billingDetails: billingDetails,
         expMonth: expMonth,
         expYear: expYear,
-        paymentType: paymentType,
         remainingInstallment: remainingInstallment,
         emi: emi,
-        publicKey : publickey
+        publicKey : publickey,
+        encryptDetails: encryptCard
       });
     res
       .status(200)

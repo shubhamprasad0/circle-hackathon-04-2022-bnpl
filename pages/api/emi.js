@@ -1,43 +1,59 @@
 import qs from "querystring";
 //import { MongoClient } from "mongodb";
+const sdk2 = require("api")("@circle-api/v1#1w4m41l6sl26apylb");
 
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 
 
 export default async function handler(req, res) {
   
-  
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
-
-const url = "mongodb+srv://shivam:shivam@cluster0.auqwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+const url =
+  "mongodb+srv://shivam:shivam@cluster0.auqwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 const client = await MongoClient.connect(url);
 
 const db = client.db();
 
-const collection = db.collection('customers');
+const collection = db.collection("customers");
 
-collection.insertOne({"Test": "Test"});
+const users = await collection.find({ paymentType: "bnpl" }).toArray();
 
-
-res.status(200).json({ name: 'John Doe'})
-
+sdk2.auth(process.env.apikey);
+console.log("userdetails" + users);
+const paymentResponses = [];
+try {
+    const user = users[0]
+    console.log(user.encryptDetails)
+ // for (const user of users) {
+      const payment = {
+        amount: 10,
+        currency: "USD",
+      };
+    const paymentResponse = await sdk2.createPayment({
+      metadata: user.metadata,
+      amount: payment,
+      autoCapture: true,
+      source: user.source,
+      idempotencyKey: uuidv4(),
+      keyId: user.publicKey["data"]["keyId"],
+      verification: "none",
+      description: "Payment",
+      encryptedData: user.encryptDetails,
+      //channel: 'ba943ff1-ca16-49b2-ba55-1057e70ca5c7'
+    });
+    //console.log(paymentResponse)
+    paymentResponses.push(paymentResponse);
+    console.log(paymentResponse)
+  
+  //   });
+  //console.log(paymentResponses);
+  res.status(200).json(paymentResponses);
+} catch (e) {
+  res.status(500).json({ e });
 }
 
-// const EASYCRON_API_KEY = process.env.EASYCRON_API_KEY;
-// const FRONT_URL = process.env.VERCEL_URL || process.env.FRONT_URL;
+//res.status(200).json({ name: 'John Doe'})
 
-// // Localhost doesn't work with easyCron, so I rename it, use ngrok instead
-// const frontUrl = FRONT_URL.replace("localhost", "locolhost");
-
-// const url = `https://www.easycron.com/rest/add?${qs.stringify({
-//   token: EASYCRON_API_KEY,
-//   url: `${frontUrl}/api/saysHappyFourthofEveryMonth`,
-//   cron_expression: "0 12 4 * *",
-//   cron_job_name: Math.floor(Math.random() * 100 * 213948),
-// })}`;
-
-// fetch(url);
+}
 
