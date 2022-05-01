@@ -75,6 +75,9 @@ const CardPaymentForm = () => {
     const response = await fetch("/api/bnpl", {
       method: "POST",
       body: payload,
+      headers: {
+        "Content-type": "application/json",
+      }
     });
     if (response.ok) {
       const data = await response.json();
