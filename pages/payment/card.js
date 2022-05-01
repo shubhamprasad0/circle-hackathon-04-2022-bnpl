@@ -14,20 +14,45 @@ const CardPaymentForm = () => {
   const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
 
+  const getAmount = () => {
+    const amount = localStorage.getItem("bnpl-amount");
+    return amount;
+  }
+
+  const getPayload = () => {
+    let [expMonth, expYear] = expiry.split("/")
+
+    const payload = {
+      cardNumber,
+      CVV: +cvv,
+      billingDetails: {
+        name,
+        city,
+        country,
+        line1: addressLine1,
+        postalCode,
+        district,
+      },
+      metadata: {
+        email,
+        sessionId: "DE6FA86F60BB47B379307F851E238617",
+        ipAddress: "244.28.239.130"
+      },
+      expMonth: +expMonth,
+      expYear: +expYear,
+      amount: {
+        amount: getAmount(),
+        currency: "USD",
+      }
+    };
+
+    return payload;
+  };
+
   const submitHandler = (event) => {
     event.preventDefault();
-    console.log({
-      cardNumber,
-      cvv,
-      expiry,
-      name,
-      addressLine1,
-      postalCode,
-      city,
-      district,
-      country,
-      email,
-    });
+    const payload = getPayload();
+    console.log(payload);
   };
 
   const preFillCardData = () => {
