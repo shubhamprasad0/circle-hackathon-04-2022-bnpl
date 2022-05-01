@@ -194,4 +194,35 @@ console.log(cardDetails)
 //   .catch(err => console.error(err));
 // }
 
+
+
+// Response 
+/*{
+    "paymentResponse": {
+        "data": {
+            "id": "0c69f880-7075-4a7a-b6e2-df1390f318a1",
+            "type": "payment",
+            "merchantId": "357a2cc4-0396-4582-b349-614b7253d21d",
+            "merchantWalletId": "1000870888",
+            "source": {
+                "id": "3e0616d6-cefc-46af-8567-16a387a6b1cb",
+                "type": "card"
+            },
+            "description": "Payment",
+            "amount": {
+                "amount": "3.14",
+                "currency": "USD"
+            },
+            "status": "pending",
+            "refunds": [],
+            "createDate": "2022-04-30T09:34:46.794Z",
+            "updateDate": "2022-04-30T09:34:46.794Z",
+            "metadata": {
+                "email": "satoshi@circle.com"
+            }
+        }
+    }
+}
+*/
+
 }
