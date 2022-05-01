@@ -29,7 +29,6 @@ export default async function handler(req, res) {
   const db = client.db();
 
   const collection = db.collection("customers");
-  collection.insertOne({ User: "Customer1" });
 
   const idempotencKey = uuidv4();
   sdk.auth(process.env.apikey);
@@ -84,6 +83,7 @@ export default async function handler(req, res) {
       expMonth: expMonth,
       expYear: expYear,
       paymentType: paymentType,
+      publicKey : publickey
     });
   } else {
     const remainingInstallment = 8;
@@ -99,7 +99,8 @@ export default async function handler(req, res) {
         expYear: expYear,
         paymentType: paymentType,
         remainingInstallment: remainingInstallment,
-        emi: emi
+        emi: emi,
+        publicKey : publickey
       });
     res
       .status(200)
