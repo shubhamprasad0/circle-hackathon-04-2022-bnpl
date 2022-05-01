@@ -25,10 +25,8 @@ const ProductScreen = ({ image, title, description, price }) => {
             className="my-2 w-1/3 h-12"
             color="primary"
             onClick={() => {
-              const currCartValue = +localStorage.getItem("bnpl-cart-value") || 0;
-              const priceNum = +price.replace("$", "").replace(",", "");
-              console.log(priceNum);
-              localStorage.setItem("bnpl-cart-value", currCartValue + priceNum);
+              const priceVal = +price.replace("$", "").replace(",", "");
+              localStorage.setItem("bnpl-amount", priceVal);
               router.push("/payment/card");
             }}
           >
