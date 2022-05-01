@@ -11,8 +11,6 @@ import {
   ModalFooter,
   ModalHeader,
 } from "reactstrap";
-import { setConstantValue } from "typescript";
-import Dialog from "../../components/Dialog";
 
 const CardPaymentForm = () => {
   const [cardNumber, setCardNumber] = useState("");
