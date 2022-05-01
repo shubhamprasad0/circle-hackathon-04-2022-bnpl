@@ -25,6 +25,7 @@ const CardPaymentForm = () => {
   const [email, setEmail] = useState("");
 
   const [showDialog, setShowDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
 
   const toggleDialog = () => {
     setShowDialog((prevState) => !prevState);
@@ -60,7 +61,6 @@ const CardPaymentForm = () => {
         amount: getAmount(),
         currency: "USD",
       },
-      paymentType,
     };
 
     return payload;
@@ -69,11 +69,18 @@ const CardPaymentForm = () => {
   const submitHandler = async (event) => {
     event.preventDefault();
     const payload = getPayload("bnpl");
-    const response = await fetch("/api/hello");
+    const response = await fetch("/api/bnpl", {
+      method: "POST",
+      body: payload,
+    });
     if (response.ok) {
       const data = await response.json();
       console.log(data);
       setShowDialog(true);
+      setDialogMessage(
+        data.message ||
+          "Your purchase is successful. The amount will be deducted as per the schedule."
+      );
     }
   };
 
@@ -488,10 +495,7 @@ const CardPaymentForm = () => {
       </div>
       <Modal centered isOpen={showDialog} toggle={toggleDialog}>
         <ModalHeader toggle={toggleDialog}>Info</ModalHeader>
-        <ModalBody>
-          Your Buy Now Pay Later transaction is successful. The amount will be
-          deducted from your credit card after a month.
-        </ModalBody>
+        <ModalBody>{dialogMessage}</ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={toggleDialog}>
             Okay
