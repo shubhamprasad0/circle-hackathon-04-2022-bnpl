@@ -31,7 +31,7 @@ const ProductScreen = ({ image, title, description, price }) => {
               router.push("/payment/card");
             }}
           >
-            Pay with Credit Card
+            Buy Now, Pay Later
           </Button>
           <Button
             className="my-2 w-1/3 h-12"
