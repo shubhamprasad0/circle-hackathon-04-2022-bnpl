@@ -24,7 +24,7 @@ export const getStaticProps = ({ params }) => {
     tv: {
       image: "/images/tv-0.png",
       title: "LG Z1 88 inch 8K Smart OLED TV",
-      price: "$29,999",
+      price: "$400",
       description: `
     - LG Real 8K SELF-LIT OLED for extraordinary detail and contrast
     - α9 Gen4 AI processor 8K with AI 8K upscaling

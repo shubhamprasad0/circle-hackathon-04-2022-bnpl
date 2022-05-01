@@ -71,19 +71,21 @@ const CardPaymentForm = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    const payload = getPayload();
+    const payload = JSON.stringify(getPayload());
     const response = await fetch("/api/bnpl", {
       method: "POST",
       body: payload,
     });
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
       setShowDialog(true);
       setDialogMessage(
         data.message ||
           "Your purchase is successful. The amount will be deducted as per the schedule."
       );
+    } else {
+      setShowDialog(true);
+      setDialogMessage("There was some error with the payment. Please try again later.")
     }
   };
 
