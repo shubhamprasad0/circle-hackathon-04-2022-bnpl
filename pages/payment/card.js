@@ -36,8 +36,10 @@ const CardPaymentForm = () => {
     return amount;
   };
 
-  const getPayload = (paymentType) => {
+  const getPayload = () => {
     let [expMonth, expYear] = expiry.split("/");
+    const paymentType = localStorage.getItem("payment-type");
+    console.log(paymentType);
 
     const payload = {
       cardNumber,
@@ -61,6 +63,7 @@ const CardPaymentForm = () => {
         amount: getAmount(),
         currency: "USD",
       },
+      paymentType,
     };
 
     return payload;
@@ -68,7 +71,7 @@ const CardPaymentForm = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    const payload = getPayload("bnpl");
+    const payload = getPayload();
     const response = await fetch("/api/bnpl", {
       method: "POST",
       body: payload,
